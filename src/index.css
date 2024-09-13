@@ -37,7 +37,12 @@ body {
     align-items: center;
     height: 7.2rem;
     padding: 0 3.2rem;
-    background-color: var(--color-primary);
+    background: linear-gradient(
+        270deg,
+        rgba(3, 66, 106, 1) 0%,
+        rgba(36, 60, 74, 1) 52%,
+        rgba(3, 66, 106, 1) 100%
+    );
     border-radius: 0.9rem;
 }
 
