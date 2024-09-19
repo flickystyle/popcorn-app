@@ -20,12 +20,15 @@ const App = () => {
     const [selectedId, setSelectedId] = useState(null);
 
     useEffect(() => {
+        const controller = new AbortController();
+
         const fetchMovies = async () => {
             try {
                 setIsLoading(true);
                 setError('');
                 const res = await fetch(
-                    `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+                    `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+                    { signal: controller.signal }
                 );
                 if (!res.ok) {
                     throw new Error(
@@ -39,10 +42,13 @@ const App = () => {
                     throw new Error(data.Error);
                 }
 
-                setTimeout(() => setMovies(data.Search), 2000);
+                setTimeout(setMovies(data.Search));
+                setError('');
             } catch (err) {
                 console.error(err.message);
-                setError(err.message);
+                if (err.name !== 'AbortError') {
+                    setError(err.message);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -55,13 +61,35 @@ const App = () => {
         }
 
         fetchMovies();
+
+        return () => {
+            controller.abort();
+        };
     }, [query]);
+
+    useEffect(() => {
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape') {
+                handleCloseMovie();
+                console.log('close');
+            }
+        });
+    }, []);
 
     const handleSelectMovie = (id) => {
         setSelectedId(id === selectedId ? null : id);
     };
     const handleCloseMovie = () => {
         setSelectedId(null);
+    };
+
+    const handleAddWatched = (movie) => {
+        setWatched([...watched, movie]);
+    };
+
+    const handleDeleteWatched = (id) => {
+        const filteredMovies = watched.filter((movie) => movie.imdbID !== id);
+        setWatched(filteredMovies);
     };
     return (
         <>
@@ -85,13 +113,18 @@ const App = () => {
                 <Box>
                     {selectedId ? (
                         <MovieDetails
+                            watched={watched}
                             selectedId={selectedId}
                             onCloseMovie={handleCloseMovie}
+                            onAddWatched={handleAddWatched}
                         />
                     ) : (
                         <>
                             <WatchedSummary watched={watched} />
-                            <WatchedMoviesList watched={watched} />
+                            <WatchedMoviesList
+                                watched={watched}
+                                onDeleteWatched={handleDeleteWatched}
+                            />
                         </>
                     )}
                 </Box>
