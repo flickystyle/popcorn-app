@@ -10,14 +10,19 @@ import ErrorMessage from './ErrorMessage';
 import MovieDetails from './MovieDetails';
 
 const KEY = '821e56eb';
+// const LOCAL_STORAGE_DATA = JSON.parse(localStorage.getItem('watched'));
 
 const App = () => {
     const [movies, setMovies] = useState([]);
-    const [watched, setWatched] = useState([]);
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [selectedId, setSelectedId] = useState(null);
+    // const [watched, setWatched] = useState(LOCAL_STORAGE_DATA);
+    const [watched, setWatched] = useState(() => {
+        const storedValue = JSON.parse(localStorage.getItem('watched'));
+        return storedValue;
+    });
 
     useEffect(() => {
         const controller = new AbortController();
@@ -76,6 +81,10 @@ const App = () => {
         });
     }, []);
 
+    useEffect(() => {
+        localStorage.setItem('watched', JSON.stringify(watched));
+    }, [watched]);
+
     const handleSelectMovie = (id) => {
         setSelectedId(id === selectedId ? null : id);
     };
@@ -85,6 +94,7 @@ const App = () => {
 
     const handleAddWatched = (movie) => {
         setWatched([...watched, movie]);
+        // localStorage.setItem('watched', JSON.stringify([...watched, movie]));
     };
 
     const handleDeleteWatched = (id) => {
