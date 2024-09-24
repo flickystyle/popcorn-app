@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useKey } from '../hooks/useKey';
 
 const NavBar = ({ children }) => {
     return (
@@ -12,24 +13,13 @@ const NavBar = ({ children }) => {
 const Search = ({ query, onSetQuery }) => {
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        const callback = (e) => {
-            if (document.activeElement === inputRef.current) {
-                return;
-            }
-
-            if (e.code === 'Enter') {
-                inputRef.current.focus();
-                onSetQuery('');
-            }
-        };
-
-        document.addEventListener('keydown', callback);
-
+    useKey('Enter', () => {
+        if (document.activeElement === inputRef.current) {
+            return;
+        }
         inputRef.current.focus();
-
-        return () => document.removeEventListener('keydown', callback);
-    }, [onSetQuery]);
+        onSetQuery('');
+    });
 
     return (
         <input

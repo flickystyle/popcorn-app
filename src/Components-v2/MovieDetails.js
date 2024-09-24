@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import StarRating from './StarRating';
 import Loader from './Loader';
+import { useKey } from '../hooks/useKey';
 
 const KEY = '821e56eb';
 
@@ -47,17 +48,7 @@ const MovieDetails = ({ watched, selectedId, onCloseMovie, onAddWatched }) => {
         return () => (document.title = 'popcorn App');
     }, [title]);
 
-    useEffect(() => {
-        const callback = (e) => {
-            if (e.code === 'Escape') {
-                onCloseMovie();
-            }
-        };
-
-        document.addEventListener('keydown', callback);
-
-        return () => document.removeEventListener('keydown', callback);
-    }, [onCloseMovie]);
+    useKey('Escape', onCloseMovie);
 
     const handleAdd = () => {
         const newWatchedMovie = {
