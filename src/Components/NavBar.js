@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef } from 'react';
+import { useKey } from '../hooks/useKey';
 
 const NavBar = ({ children }) => {
     return (
@@ -9,16 +10,25 @@ const NavBar = ({ children }) => {
     );
 };
 
-const Search = () => {
-    const [query, setQuery] = useState('');
+const Search = ({ query, onSetQuery }) => {
+    const inputRef = useRef(null);
+
+    useKey('Enter', () => {
+        if (document.activeElement === inputRef.current) {
+            return;
+        }
+        inputRef.current.focus();
+        onSetQuery('');
+    });
 
     return (
         <input
+            ref={inputRef}
             className="search"
             type="text"
             placeholder="Search movies..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => onSetQuery(e.target.value)}
         />
     );
 };
